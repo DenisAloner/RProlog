@@ -11,24 +11,18 @@ Solver::~Solver()
 
 bool Solver::solve(def::term* a, def::term* b)
 {
+	bindings.push_front(nullptr);
 	def::structure* an = static_cast<def::structure*>(a);
 	def::rule* bn = static_cast<def::rule*>(b);
-	def::context* c = new def::context();
-	for (int i = 0; i < bn->variables.size(); i++)
-	{
-		c->push_back(def::reference());
-	}
-	bn->contexts.push_front(c);
-	bc.push_front(c);
-	steps.push_front(def::step(an, bn, 1, 1,0));
+	steps.push_front(def::step(an, bn, 1, 1, 0, bindings.front()));
 	return trace();
+
 }
 
 bool Solver::trace()
 {
 	HANDLE  hConsole;
 	hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-
 	def::term* a;
 	def::term* b;
 	goal = false;
@@ -41,7 +35,8 @@ bool Solver::trace()
 		}
 		def::step& s = steps.front();
 		SetConsoleTextAttribute(hConsole, 12);
-		std::cout << "Stack size:" <<steps.size() << " Callback:"<< callback <<  " Goal:"<< goal << std::endl;
+		//system("pause");
+		std::cout << "#Stack size:" << steps.size() << "   Callback:" << callback << "   Goal:" << goal << "   Index:" << s.index << std::endl;
 		SetConsoleTextAttribute(hConsole, 128);
 		if (callback)
 		{
@@ -70,9 +65,14 @@ bool Solver::trace()
 						bool add_variant = false;
 						if ((s.ai+1) < an->terms.size())
 						{
-							steps.push_front(def::step(an, bn, s.ai, s.bi,s.index));
+							std::cout << def::WriteTerm(steps.begin()->a) << std::endl;
+							std::cout << def::WriteTerm(steps.begin()->b) << std::endl;
+							steps.push_front(def::step(an, bn, s.ai, s.bi,s.index,s.bind));
 							std::swap(steps.begin(), steps.begin()++);
 							add_variant = true;
+							std::cout << "swap" << s.index << std::endl;
+							std::cout << def::WriteTerm(steps.begin()->a) << std::endl;
+							std::cout << def::WriteTerm(steps.begin()->b) << std::endl;
 						}
 						s.ai = 1;
 						s.bi += 1;
@@ -86,17 +86,42 @@ bool Solver::trace()
 									return true;
 								}
 								steps.push_front(p);
+							} else {
+								if (s.index == 0)
+								{
+									return true;
+								}
 							}
 						} else {
+							std::cout << s.bi << std::endl;
 							callback = false;
 						}
 					} else {
 						s.ai += 1;
 						if (s.ai == an->terms.size())
 						{
+							std::cout << "step 1" << std::endl;
+							while (bindings.front()!=s.bind)
+							{
+								std::cout << "step 1a" << std::endl;
+								bindings.front()->ref->terms.back() = nullptr;
+								bindings.pop_front();
+							}
+							for (int i = 0; i < bn->context.size(); i++)
+							{
+								bn->context[i]->terms.pop_back();
+							}
 							steps.pop_front();
 						}
 						else {
+							std::cout << "step 2" << std::endl;
+							while (bindings.front() != s.bind)
+							{
+								std::cout << "step 2a" << std::endl;
+								bindings.front()->ref->terms.back() = nullptr;
+								bindings.pop_front();
+							}
+							std::cout << "bindings " << bindings.size()<< std::endl;
 							callback = false;
 						}
 					}
@@ -104,16 +129,14 @@ bool Solver::trace()
 				else {
 					if (s.bi == 0)
 					{
-						def::context* c = new def::context();
-						for (int i = 0; i < bn->variables.size(); i++)
+						std::cout << "context made" << s.bi << std::endl;
+						for (int i = 0; i < bn->context.size(); i++)
 						{
-							c->push_back(def::reference());
+							bn->context[i]->terms.push_back(nullptr);
 						}
-						bn->contexts.push_front(c);
-						steps.push_front(def::step(an, bn, 1, 1,s.index+1));
-						bc.push_front(c);
+						steps.push_front(def::step(an, bn, 1, 1, s.index + 1, bindings.front()));
 					} else {
-						steps.push_front(def::step(an, bn, s.ai, s.bi,s.index+1));
+						steps.push_front(def::step(an, bn, s.ai, s.bi, s.index + 1, bindings.front()));
 					}
 				}
 				break;
@@ -151,7 +174,7 @@ bool Solver::trace()
 				else {
 					if (an->terms.size() == bn->terms.size())
 					{
-						steps.push_front(def::step(an, bn, 0, 0,s.index+1));
+						steps.push_front(def::step(an, bn, 0, 0, s.index + 1, bindings.front()));
 					}
 					else {
 						callback = true;
@@ -201,10 +224,10 @@ bool Solver::trace()
 			{
 				std::cout << "variable atom" << std::endl;
 				def::atom* an = static_cast<def::atom*>(a);
-				def::reference& bv = (*bc.front())[bn->index];
-				if (bv.item)
+				def::reference* br = bn->item;
+				if (br->terms.back())
 				{
-					def::term* bt = bv.item;
+					def::term* bt = br->terms.back();
 					switch (bt->kind)
 					{
 					case def::term_kind_e::atom:
@@ -223,7 +246,8 @@ bool Solver::trace()
 				} else {
 					callback = true;
 					goal = true;
-					bv.item = an;
+					br->terms.back() = an;
+					bindings.push_front(new def::binding(br));
 				}
 				break;
 			}
@@ -238,6 +262,4 @@ bool Solver::trace()
 		}
 		}
 	}
-
-
 }

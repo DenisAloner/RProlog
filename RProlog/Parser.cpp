@@ -51,13 +51,13 @@ unsigned int Parser::parse_from_pos(def::terms* t, unsigned int s, def::rule* r)
 					{
 						bool IsNew = true;
 						std::string name = m_text.substr(w + 1, i - w - 1);
-						for (int i = 0; i<r->variables.size(); i++)
+						for (int i = 0; i<r->context.size(); i++)
 						{
-							if (r->variables[i] == name)
+							if (r->context[i]->name == name)
 							{
 								def::variable* n = new def::variable();
 								n->kind = def::term_kind_e::variable;
-								n->index = i;
+								n->item = r->context[i];
 								t->push_back(n);
 								IsNew = false;
 								break;
@@ -65,10 +65,11 @@ unsigned int Parser::parse_from_pos(def::terms* t, unsigned int s, def::rule* r)
 						}
 						if (IsNew)
 						{
-							r->variables.push_back(m_text.substr(w + 1, i - w - 1));
+							def::reference* ref = new def::reference(m_text.substr(w + 1, i - w - 1));
+							r->context.push_back(ref);
 							def::variable* n = new def::variable();
 							n->kind = def::term_kind_e::variable;
-							n->index = r->variables.size() - 1;
+							n->item = ref;
 							t->push_back(n);
 							break;
 						}

@@ -17,8 +17,7 @@ private:
 	bool callback;
 	bool goal;
 
-	std::list<def::context*> ac;
-	std::list<def::context*> bc;
+	std::list<def::binding*> bindings;
 	std::list<def::step> steps;
 	bool trace();
 	

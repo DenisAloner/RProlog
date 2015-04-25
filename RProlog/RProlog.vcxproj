@@ -69,6 +69,7 @@
     <ClInclude Include="Solver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="definiton.cpp" />
     <ClCompile Include="Parser.cpp" />
     <ClCompile Include="RProlog.cpp" />
     <ClCompile Include="Solver.cpp" />
