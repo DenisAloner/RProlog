@@ -91,7 +91,7 @@ bool Solver::trace()
 							}
 						} else {
 							callback = false;
-							steps.push_front(new def::step(an, bn, s->ai, s->bi, s->index + 1, bindings.front()));
+							steps.push_front(new def::step(an, bn, s->ai, s->bi, s->index, bindings.front()));
 						}
 					} else {
 						s->ai += 1;
@@ -105,10 +105,11 @@ bool Solver::trace()
 								bindings.pop_front();
 							}
 							if (bindings.size() != 1)
-							{ 
+							{
+								std::cout << "delete bindings " << bindings.size() << std::endl;
 								for (int i = 0; i < bn->context.size(); i++)
 								{
-									bn->context[i]->terms.pop_back();
+									if (bn->context[i]->terms.size() != 1){ bn->context[i]->terms.pop_back(); }
 								}
 							}
 							steps.pop_front();

@@ -6,7 +6,7 @@ int main() {
 	std::cout.setf(std::ios::boolalpha);
 	Parser p;
 	Solver s;
-	def::term* program = p.parse("[program [> 4 1 4] [> 3 2 8] [> 1 4 2] [> 4 4 5] [> 4 4 2]]");
+	def::term* program = p.parse("[program [> 4 1 4] [> 3 2 8] [> 1 4 2] [> 4 3 5] [> 4 4 2]]");
 	def::term* query = p.parse("[[query] [> 4 ?x 5] [> ?x 4 2]]");
 	/*def::atom* a=new def::atom;
 	a->kind = def::term_kind_e::atom;
