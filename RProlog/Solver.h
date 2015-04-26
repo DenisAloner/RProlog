@@ -18,7 +18,7 @@ private:
 	bool goal;
 
 	std::list<def::binding*> bindings;
-	std::list<def::step> steps;
+	std::list<def::step*> steps;
 	bool trace();
 	
 
