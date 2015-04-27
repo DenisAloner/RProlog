@@ -14,13 +14,15 @@ public:
 
 private:
 	
+	HANDLE  hConsole;
+
 	bool callback;
 	bool goal;
 
 	std::list<def::binding*> bindings;
 	std::list<def::step*> steps;
 	bool trace();
+	void write_step_stack();
 	
-
 };
 

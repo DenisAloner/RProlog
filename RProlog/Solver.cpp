@@ -2,7 +2,11 @@
 
 Solver::Solver()
 {
-
+	hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	COORD  size;
+	size.X = 160;
+	size.Y = 1001;
+	SetConsoleScreenBufferSize(hConsole, size);
 }
 Solver::~Solver()
 {
@@ -19,10 +23,16 @@ bool Solver::solve(def::term* a, def::term* b)
 
 }
 
+void Solver::write_step_stack()
+{
+	for (auto i = steps.begin(); i != steps.end(); i++)
+	{
+		std::cout << (*i)->index << " " << (*i)->ai << " " << (*i)->bi << ": " << def::WriteTerm((*i)->a) << " | " << def::WriteTerm((*i)->b) << std::endl;
+	}
+}
+
 bool Solver::trace()
 {
-	HANDLE  hConsole;
-	hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	def::term* a;
 	def::term* b;
 	goal = false;
@@ -34,10 +44,10 @@ bool Solver::trace()
 			return goal;
 		}
 		def::step* s = steps.front();
-		SetConsoleTextAttribute(hConsole, 12);
-		//system("pause");
+		SetConsoleTextAttribute(hConsole, 4);
 		std::cout << "#Stack size:" << steps.size() << "   Callback:" << callback << "   Goal:" << goal << "   Index:" << s->index << std::endl;
-		SetConsoleTextAttribute(hConsole, 128);
+		//write_step_stack();
+		SetConsoleTextAttribute(hConsole, 8);
 		if (callback)
 		{
 			a = s->a;
@@ -65,10 +75,9 @@ bool Solver::trace()
 						bool add_variant = false;
 						if ((s->ai+1) < an->terms.size())
 						{
-							steps.push_front(new def::step(an, bn, s->ai, s->bi,s->index,s->bind));
-							std::swap(steps.begin(), steps.begin()++);
+							steps.push_front(new def::step(an, bn, s->ai + 1, s->bi, s->index, s->bind));
+							std::swap(*steps.begin(), *std::next(steps.begin()));
 							add_variant = true;
-							std::cout << "swap" << s->index << std::endl;
 							s = steps.front();
 						}
 						s->ai = 1;
@@ -91,7 +100,8 @@ bool Solver::trace()
 							}
 						} else {
 							callback = false;
-							steps.push_front(new def::step(an, bn, s->ai, s->bi, s->index, bindings.front()));
+							s->bind = bindings.front();
+							//steps.push_front(new def::step(an, bn, s->ai, s->bi, s->index, bindings.front()));
 						}
 					} else {
 						s->ai += 1;
