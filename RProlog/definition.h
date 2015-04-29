@@ -1,6 +1,9 @@
 #pragma once
 #include <list>
 #include <vector>
+#include <Windows.h>
+#include <iostream>
+#include <string>
 namespace def
 {
 	enum class term_kind_e
@@ -74,5 +77,32 @@ namespace def
 	};
 
 	std::string WriteTerm(def::term* a);
+
+	class Console
+	{
+	public:
+
+		void write_term(term* a);
+		void set_color(int i);
+
+		static Console& get()
+		{
+			static Console instance; // Guaranteed to be destroyed.
+			// Instantiated on first use.
+			return instance;
+		}
+	private:
+
+		HANDLE  m_handle;
+
+		const int m_bracket_color = 2;
+		const int m_term_color = 3;
+		const int m_variable_color = 3;
+
+		Console();
+		Console(Console const&) = delete;
+		void operator=(Console const&) = delete;
+
+	};
 	
 }

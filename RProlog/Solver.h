@@ -2,7 +2,6 @@
 #include "definition.h"
 #include <iostream>
 #include <string>
-#include <Windows.h>
 class Solver
 {
 public:
@@ -14,8 +13,6 @@ public:
 
 private:
 	
-	HANDLE  hConsole;
-
 	bool callback;
 	bool goal;
 
