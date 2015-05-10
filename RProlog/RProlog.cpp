@@ -3,7 +3,8 @@
 #include "Solver.h"
 #include "definition.h"
 
-int main() {
+int main()
+{
 	std::cout.setf(std::ios::boolalpha);
 	Parser p;
 	Solver s;

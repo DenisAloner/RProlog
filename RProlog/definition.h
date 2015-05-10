@@ -70,9 +70,10 @@ namespace def
 		int bi;
 		int index;
 		binding* bind;
+		bool variation;
 
-		step() : a(nullptr), b(nullptr), ai(0), bi(0){};
-		step(structure* a, structure* b, int ai, int bi, int index, binding* bind) : a(a), b(b), ai(ai), bi(bi), index(index),bind(bind){};
+		step() : a(nullptr), b(nullptr), ai(0), bi(0), variation(false){};
+		step(structure* a, structure* b, int ai, int bi, int index, binding* bind) : a(a), b(b), ai(ai), bi(bi), index(index),bind(bind),variation(false){};
 
 	};
 

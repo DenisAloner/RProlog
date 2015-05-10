@@ -14,6 +14,7 @@ public:
 private:
 	
 	bool callback;
+	bool rollback;
 	bool goal;
 
 	std::list<def::binding*> bindings;

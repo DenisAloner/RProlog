@@ -63,13 +63,11 @@ def::Console::Console()
 	COORD  size;
 	size.X = 160;
 	size.Y = 1001;
-	SMALL_RECT k;
-	k.Left = 0;
-	k.Top = 0;
-	k.Right = 160;
-	k.Bottom = 40;
-	SetConsoleWindowInfo(m_handle, TRUE, &k);
 	SetConsoleScreenBufferSize(m_handle, size);
+	_CONSOLE_SCREEN_BUFFER_INFO info;
+	GetConsoleScreenBufferInfo(m_handle, &info);
+	SMALL_RECT windowMaxSize = { 0, 0, info.dwMaximumWindowSize.X - 1, 40 };
+	SetConsoleWindowInfo(m_handle, TRUE, &windowMaxSize);
 }
 
 void def::Console::set_color(int i)
@@ -128,9 +126,9 @@ void def::Console::write_term(def::term* a)
 	case def::term_kind_e::variable:
 	{
 		def::reference* n = static_cast<def::variable*>(a)->item;
-		if (n->terms.front())
+		if (n->terms.back())
 		{
-			write_term(n->terms.front());
+			write_term(n->terms.back());
 		}
 		else
 		{
